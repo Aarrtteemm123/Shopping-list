@@ -1,6 +1,8 @@
+from kivy.uix.floatlayout import FloatLayout
 from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.tab import MDTabsBase
 
 KV =  '''
 BoxLayout:
@@ -11,29 +13,22 @@ BoxLayout:
         title: 'Shopping list'
         right_action_items: [["dots-vertical", lambda x: app.menu.open()]]
     
-    MDScreen:
-        name: "screen_1"
-
-    MDBottomNavigation:
-
-        MDBottomNavigationItem:
-            name: 'screen 1'
-            text: 'History'
-            icon: 'language-python'
-
+    MDTabs:
+        Tab:
+            text: "History"
             MDLabel:
                 text: 'History purchase'
                 halign: 'center'
 
-        MDBottomNavigationItem:
-            name: 'screen 2'
-            text: 'Active'
-            icon: 'language-cpp'
-
+        Tab:
+            text: "Active"
             MDLabel:
                 text: 'Active items'
                 halign: 'center'
 '''
+
+class Tab(FloatLayout, MDTabsBase):
+    '''Class implementing content for a tab.'''
 
 class MyApp(MDApp):
 
