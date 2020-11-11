@@ -1,0 +1,78 @@
+BoxLayout:
+    orientation:'vertical'
+    
+    MDToolbar:
+        id: button
+        title: 'Shopping list'
+        right_action_items: [["dots-vertical", lambda x: app.menu.open()]]
+            
+    ScreenManager: 
+        id:screen_manager
+        MainScreen:
+        SettingsScreen:
+        AboutScreen:
+
+<Content>
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "150dp"
+
+    MDTextField:
+        hint_text: "City"
+
+    MDTextField:
+        hint_text: "Street"
+    
+    MDRaisedButton:
+        text: "Choose date"
+        on_release: app.show_date_picker()
+  
+<MainScreen>:
+    name: 'main' 
+    MDTabs:
+        Tab:
+            text: "History"
+            MDLabel:
+                text: 'History purchase'
+                halign: 'center'
+
+        Tab:
+            text: "Active"
+            MDLabel:
+                text: 'Active items'
+                halign: 'center'
+    MDFloatingActionButton:
+        icon: "plus"
+        pos_hint: {"center_x": .9, "center_y": .1}
+        md_bg_color: [0.11372549019607843, 0.9137254901960784, 0.7137254901960784, 1.0]
+        on_release: app.show_alert_dialog()
+
+
+<SettingsScreen>:
+    name: 'settings'
+    MDIconButton:
+        id: back_from_settings
+        icon: "arrow-left"
+        pos_hint: {"center_x": .075, "center_y": .95}
+        on_release: app.back_to_main_menu()
+    MDLabel:
+        text: 'Settings'
+        pos_hint: {"center_x": .95, "center_y": .95}
+        font_style: 'H6'
+    MDSwitch:
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        width: dp(45)
+        on_active: app.check_color_mode(*args)
+        
+<AboutScreen>:
+    name: 'about'
+    MDIconButton:
+        id: back_from_about
+        icon: "arrow-left"
+        pos_hint: {"center_x": .075, "center_y": .95}
+        on_release: app.back_to_main_menu()
+    MDLabel:
+        text: 'Name: shopping list\nVersion: 1.0\nDeveloper: Artem Morarash\nAbout project: This app can help you not to forget about shopping'
+        halign: 'center'
+        font_style: 'H6'
