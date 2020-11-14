@@ -35,15 +35,18 @@ BoxLayout:
     MDTabs:
         Tab:
             text: "History"
-            MDLabel:
-                text: 'History purchase'
-                halign: 'center'
+            ScrollView:
+
+                MDList:
+                    id: scroll_history
+
 
         Tab:
             text: "Active"
-            MDLabel:
-                text: 'Active items'
-                halign: 'center'
+            ScrollView:
+
+                MDList:
+                    id: scroll_active
 
 
 <SettingsScreen>:

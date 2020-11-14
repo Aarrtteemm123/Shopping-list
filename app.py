@@ -3,8 +3,10 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import Screen
 from kivymd.app import MDApp
 from kivy.lang import Builder
+from kivymd.icon_definitions import md_icons
 from kivymd.uix.button import MDFlatButton, MDFloatingActionButton
 from kivymd.uix.dialog import MDDialog
+from kivymd.uix.list import TwoLineAvatarIconListItem
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.tab import MDTabsBase
 
@@ -58,6 +60,22 @@ class MyApp(MDApp):
             on_release=self.dialog.open
         )
         self.screen.ids.screen_manager.get_screen('main').add_widget(self.but_add)
+        for i in range(10):
+            self.screen.ids.screen_manager.get_screen('main').ids.scroll_history.add_widget(
+                TwoLineAvatarIconListItem(text=f"Item {i}", secondary_text = 'sec text', on_release=self.click_on_list_item)
+            )
+        for i in range(10):
+            self.screen.ids.screen_manager.get_screen('main').ids.scroll_active.add_widget(
+                TwoLineAvatarIconListItem(text=f"Item {i}", secondary_text = 'sec text', on_release=self.click_on_history_list_item)
+            )
+
+    def click_on_list_item(self,item):
+        print(item.text)
+        print(self.screen.ids.screen_manager.get_screen('main').ids.scroll_history.remove_widget(item))
+        print(self.screen.ids.screen_manager.get_screen('main').ids.scroll_active.add_widget(item))
+
+    def click_on_history_list_item(self,item):
+        print(item.text)
 
     def click_ok(self,*args):
         print(self.dialog.content_cls.ids.item.text)
