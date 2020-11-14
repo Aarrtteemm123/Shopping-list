@@ -6,7 +6,6 @@ from kivy.lang import Builder
 from kivymd.uix.button import MDFlatButton, MDFloatingActionButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.picker import MDDatePicker
 from kivymd.uix.tab import MDTabsBase
 
 
@@ -30,7 +29,6 @@ class MyApp(MDApp):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.screen = Builder.load_file('app.kv')
-
         self.menu = MDDropdownMenu(
             caller=self.screen.ids.button,
             items=[{"text": 'Settings'}, {"text": 'About project'}],
@@ -45,10 +43,10 @@ class MyApp(MDApp):
             content_cls=Content(),
             buttons=[
                 MDFlatButton(
-                    text="CANCEL", text_color=self.theme_cls.primary_color,
+                    text="CANCEL", text_color=self.theme_cls.primary_color,on_release=self.dialog_close
                 ),
                 MDFlatButton(
-                    text="OK", text_color=self.theme_cls.primary_color,
+                    text="OK", text_color=self.theme_cls.primary_color,on_release=self.click_ok
                 ),
             ],
         )
@@ -61,6 +59,14 @@ class MyApp(MDApp):
         )
         self.screen.ids.screen_manager.get_screen('main').add_widget(self.but_add)
 
+    def click_ok(self,*args):
+        print(self.dialog.content_cls.ids.item.text)
+        print(self.dialog.content_cls.ids.number.text)
+        print(self.dialog.content_cls.ids.details.text)
+        self.dialog.dismiss()
+
+    def dialog_close(self,*args):
+        self.dialog.dismiss()
 
     def switch_color_mode(self, switch, value):
         if value:
@@ -70,13 +76,6 @@ class MyApp(MDApp):
         else:
             self.theme_cls.theme_style = 'Light'
             self.dialog.md_bg_color = [1, 1, 1, 1.0]
-
-    def callback_date_picker(self, date):
-        print(date.day)
-
-    def open_date_picker(self):
-        date_dialog = MDDatePicker(callback=self.callback_date_picker)
-        date_dialog.open()
 
     def open_dialog(self):
         self.dialog.open()
