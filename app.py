@@ -30,6 +30,7 @@ class MyApp(MDApp):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.buffer_item = None
         self.screen = Builder.load_file('app.kv')
         self.menu = MDDropdownMenu(
             caller=self.screen.ids.button,
@@ -38,17 +39,49 @@ class MyApp(MDApp):
         )
         self.menu.bind(on_release=self.callback_menu_toolbar)
 
-        self.dialog = MDDialog(
+        self.dialog_new_item = MDDialog(
             title="Address:",
             type="custom",
             md_bg_color=[1, 1, 1, 1.0],
             content_cls=Content(),
             buttons=[
                 MDFlatButton(
-                    text="CANCEL", text_color=self.theme_cls.primary_color,on_release=self.dialog_close
+                    text="CANCEL", text_color=self.theme_cls.primary_color,on_release=self.dialog_new_item_close
                 ),
                 MDFlatButton(
-                    text="OK", text_color=self.theme_cls.primary_color,on_release=self.click_ok
+                    text="OK", text_color=self.theme_cls.primary_color,on_release=self.dialog_new_item_ok
+                ),
+            ],
+        )
+
+        self.dialog_complete = MDDialog(
+            title="Complete item",
+            text="Do you want the item to move into the history?",
+            md_bg_color=[1, 1, 1, 1.0],
+            buttons=[
+                MDFlatButton(
+                    text="NO", text_color=self.theme_cls.primary_color,
+                    on_release=self.dialog_complete_no
+                ),
+                MDFlatButton(
+                    text="YES", text_color=self.theme_cls.primary_color,
+                    on_release=self.dialog_complete_yes
+                ),
+            ],
+        )
+
+        self.dialog_delete= MDDialog(
+            title="Delete item",
+            text="Are you sure you want to delete this item?\nYou will not restore them after delete",
+            md_bg_color=[1, 1, 1, 1.0],
+            buttons=[
+                MDFlatButton(
+                    text="NO", text_color=self.theme_cls.primary_color,
+                    on_release=self.dialog_delete_no
+                ),
+                MDFlatButton(
+                    text="YES", text_color=self.theme_cls.primary_color,
+                    on_release = self.dialog_delete_yes
                 ),
             ],
         )
@@ -57,46 +90,72 @@ class MyApp(MDApp):
             icon="plus",
             pos_hint={"center_x": .9, "center_y": .1},
             md_bg_color=[0.11372549019607843, 0.9137254901960784, 0.7137254901960784, 1.0],
-            on_release=self.dialog.open
+            on_release=self.click_but_add
         )
         self.screen.ids.screen_manager.get_screen('main').add_widget(self.but_add)
         for i in range(10):
             self.screen.ids.screen_manager.get_screen('main').ids.scroll_history.add_widget(
-                TwoLineAvatarIconListItem(text=f"Item {i}", secondary_text = 'sec text', on_release=self.click_on_list_item)
+                TwoLineAvatarIconListItem(text=f"Item {i}", secondary_text = 'history text',
+                                          on_release=self.click_on_history_list_item)
             )
         for i in range(10):
             self.screen.ids.screen_manager.get_screen('main').ids.scroll_active.add_widget(
-                TwoLineAvatarIconListItem(text=f"Item {i}", secondary_text = 'sec text', on_release=self.click_on_history_list_item)
+                TwoLineAvatarIconListItem(text=f"Item {i}", secondary_text = 'active text',
+                                          on_release=self.click_on_active_list_item)
             )
+    def click_but_add(self,*args):
+        self.dialog_new_item.open()
 
-    def click_on_list_item(self,item):
-        print(item.text)
-        print(self.screen.ids.screen_manager.get_screen('main').ids.scroll_history.remove_widget(item))
-        print(self.screen.ids.screen_manager.get_screen('main').ids.scroll_active.add_widget(item))
+    def dialog_complete_yes(self, *args):
+        self.dialog_complete.dismiss()
+        self.screen.ids.screen_manager.get_screen('main').ids.scroll_active.remove_widget(self.buffer_item)
+        self.screen.ids.screen_manager.get_screen('main').ids.scroll_history.add_widget(self.buffer_item)
+        self.buffer_item = None
+
+    def dialog_complete_no(self, *args):
+        self.dialog_complete.dismiss()
+        self.buffer_item = None
+
+    def dialog_delete_no(self, *args):
+        self.dialog_delete.dismiss()
+        self.buffer_item = None
+
+    def dialog_delete_yes(self, *args):
+        self.dialog_delete.dismiss()
+        self.screen.ids.screen_manager.get_screen('main').ids.scroll_history.remove_widget(self.buffer_item)
+        self.buffer_item = None
+
+    def click_on_active_list_item(self, item):
+        self.buffer_item = item
+        self.dialog_complete.open()
 
     def click_on_history_list_item(self,item):
-        print(item.text)
+        self.buffer_item = item
+        self.dialog_delete.open()
 
-    def click_ok(self,*args):
-        print(self.dialog.content_cls.ids.item.text)
-        print(self.dialog.content_cls.ids.number.text)
-        print(self.dialog.content_cls.ids.details.text)
-        self.dialog.dismiss()
+    def dialog_new_item_ok(self, *args):
+        item = self.dialog_new_item.content_cls.ids.item.text
+        number = self.dialog_new_item.content_cls.ids.number.text
+        details = self.dialog_new_item.content_cls.ids.details.text
+        self.screen.ids.screen_manager.get_screen('main').ids.scroll_active.add_widget(
+            TwoLineAvatarIconListItem(text=item+'  '+number, secondary_text=details,
+                                      on_release=self.click_on_active_list_item))
+        self.dialog_new_item.dismiss()
 
-    def dialog_close(self,*args):
-        self.dialog.dismiss()
+    def dialog_new_item_close(self, *args):
+        self.dialog_new_item.dismiss()
 
     def switch_color_mode(self, switch, value):
         if value:
             self.theme_cls.theme_style = 'Dark'
-            self.dialog.md_bg_color = [0.15, 0.15, 0.15, 1.0]
+            self.dialog_new_item.md_bg_color = [0.15, 0.15, 0.15, 1.0]
 
         else:
             self.theme_cls.theme_style = 'Light'
-            self.dialog.md_bg_color = [1, 1, 1, 1.0]
+            self.dialog_new_item.md_bg_color = [1, 1, 1, 1.0]
 
     def open_dialog(self):
-        self.dialog.open()
+        self.dialog_new_item.open()
 
     def change_screen(self, name_screen):
         self.root.ids.screen_manager.current = name_screen
