@@ -3,7 +3,6 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import Screen
 from kivymd.app import MDApp
 from kivy.lang import Builder
-from kivymd.icon_definitions import md_icons
 from kivymd.uix.button import MDFlatButton, MDFloatingActionButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.list import TwoLineAvatarIconListItem
@@ -109,6 +108,8 @@ class MyApp(MDApp):
     def dialog_complete_yes(self, *args):
         self.dialog_complete.dismiss()
         self.screen.ids.screen_manager.get_screen('main').ids.scroll_active.remove_widget(self.buffer_item)
+        self.buffer_item = TwoLineAvatarIconListItem(text=self.buffer_item.text,
+            secondary_text=self.buffer_item.secondary_text,on_release=self.click_on_history_list_item)
         self.screen.ids.screen_manager.get_screen('main').ids.scroll_history.add_widget(self.buffer_item)
         self.buffer_item = None
 
