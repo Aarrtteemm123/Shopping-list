@@ -36,46 +36,58 @@ BoxLayout:
         Tab:
             text: "Active"
             ScrollView:
-
                 MDList:
                     id: scroll_active
-
 
         Tab:
             text: "History"
             ScrollView:
-
                 MDList:
                     id: scroll_history
 
-
 <SettingsScreen>:
     name: 'settings'
+
     MDIconButton:
         id: back_from_settings
         icon: "arrow-left"
         pos_hint: {"center_x": .075, "center_y": .95}
         on_release: app.change_screen('main')
+
     MDLabel:
         text: 'Settings'
         pos_hint: {"center_x": .95, "center_y": .95}
         font_style: 'H6'
+
     MDLabel:
         text: 'Dark mode'
         pos_hint: {"center_x": .6, "center_y": .5}
         font_style: 'Subtitle1'
+
     MDSwitch:
         pos_hint: {'center_x': .8, 'center_y': .5}
         width: dp(45)
         on_active: app.switch_color_mode(*args)
+
+    MDLabel:
+        text: 'Auto clear history'
+        pos_hint: {"center_x": .6, "center_y": .7}
+        font_style: 'Subtitle1'
+
+    MDSwitch:
+        pos_hint: {'center_x': .8, 'center_y': .7}
+        width: dp(45)
+        on_active: app.switch_clear_mode(*args)
         
 <AboutScreen>:
     name: 'about'
+
     MDIconButton:
         id: back_from_about
         icon: "arrow-left"
         pos_hint: {"center_x": .075, "center_y": .95}
         on_release: app.change_screen('main')
+
     MDLabel:
         text: 'Name: shopping list\nVersion: 1.0\nDeveloper: Artem Morarash\nAbout project: This app can help you not to forget about shopping'
         halign: 'center'
