@@ -110,6 +110,9 @@ class MyApp(MDApp):
             )
 
     def click_but_add(self, *args):
+        self.dialog_new_item.content_cls.ids.item.text = ''
+        self.dialog_new_item.content_cls.ids.number.text = ''
+        self.dialog_new_item.content_cls.ids.details.text = ''
         self.dialog_new_item.open()
 
     def dialog_complete_yes(self, *args):
