@@ -160,17 +160,20 @@ class MyApp(MDApp):
     def dialog_new_item_close(self, *args):
         self.dialog_new_item.dismiss()
 
-    def switch_clear_mode(self, *args):
-        self.auto_clear = not self.auto_clear
+    def switch_clear_mode(self, switch, value):
+        self.auto_clear = value
 
     def switch_color_mode(self, switch, value):
         if value:
             self.theme_cls.theme_style = 'Dark'
             self.dialog_new_item.md_bg_color = [0.15, 0.15, 0.15, 1.0]
-
+            self.dialog_complete.md_bg_color = [0.15, 0.15, 0.15, 1.0]
+            self.dialog_delete.md_bg_color = [0.15, 0.15, 0.15, 1.0]
         else:
             self.theme_cls.theme_style = 'Light'
             self.dialog_new_item.md_bg_color = [1, 1, 1, 1.0]
+            self.dialog_complete.md_bg_color = [1, 1, 1, 1.0]
+            self.dialog_delete.md_bg_color = [1, 1, 1, 1.0]
 
     def change_screen(self, name_screen):
         self.root.ids.screen_manager.current = name_screen
