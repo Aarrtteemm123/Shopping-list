@@ -1,3 +1,4 @@
+from kivy.storage.jsonstore import JsonStore
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import Screen
@@ -34,6 +35,7 @@ class MyApp(MDApp):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.store = JsonStore('data.json')
         self.buffer_item = None
         self.auto_clear = False
         self.screen = Builder.load_file('app.kv')
@@ -179,6 +181,20 @@ class MyApp(MDApp):
         if instance_menu_item.text == 'About project':
             self.change_screen('about')
         instance_menu.dismiss()
+
+    def on_stop(self):
+        self.store.put('settings',
+                       auto_clear = self.auto_clear,
+                       color_mode = self.theme_cls.theme_style,
+                       switch_color_mode_value=self.screen.ids.screen_manager.get_screen('settings').ids.color_mode.active,
+                       switch_clear_mode_value=self.screen.ids.screen_manager.get_screen('settings').ids.clear_mode.active)
+
+    def on_start(self):
+        settings = self.store.get('settings')
+        self.auto_clear = settings['auto_clear']
+        self.theme_cls.theme_style = settings['color_mode']
+        self.screen.ids.screen_manager.get_screen('settings').ids.color_mode.active = settings['switch_color_mode_value']
+        self.screen.ids.screen_manager.get_screen('settings').ids.clear_mode.active = settings['switch_clear_mode_value']
 
     def build(self):
         return self.screen
