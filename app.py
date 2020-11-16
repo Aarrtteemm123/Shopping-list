@@ -38,6 +38,8 @@ class MyApp(MDApp):
         self.store = JsonStore('data.json')
         self.buffer_item = None
         self.auto_clear = False
+        self.active_data_items = []
+        self.history_data_items = []
         self.screen = Builder.load_file('app.kv')
         self.menu = MDDropdownMenu(
             caller=self.screen.ids.button,
@@ -100,16 +102,6 @@ class MyApp(MDApp):
             on_release=self.click_but_add
         )
         self.screen.ids.screen_manager.get_screen('main').add_widget(self.but_add)
-        for i in range(10):
-            self.screen.ids.screen_manager.get_screen('main').ids.scroll_history.add_widget(
-                TwoLineAvatarIconListItem(text=f"Item {i}", secondary_text='history text',
-                                          on_release=self.click_on_history_list_item)
-            )
-        for i in range(10):
-            self.screen.ids.screen_manager.get_screen('main').ids.scroll_active.add_widget(
-                TwoLineAvatarIconListItem(text=f"Item {i}", secondary_text='active text',
-                                          on_release=self.click_on_active_list_item)
-            )
 
     def click_but_add(self, *args):
         self.dialog_new_item.content_cls.ids.item.text = ''
@@ -120,11 +112,13 @@ class MyApp(MDApp):
     def dialog_complete_yes(self, *args):
         self.dialog_complete.dismiss()
         self.screen.ids.screen_manager.get_screen('main').ids.scroll_active.remove_widget(self.buffer_item)
+        self.active_data_items.remove({'text':self.buffer_item.text,'secondary_text':self.buffer_item.secondary_text})
         if not self.auto_clear:
             self.buffer_item = TwoLineAvatarIconListItem(text=self.buffer_item.text,
                                                          secondary_text=self.buffer_item.secondary_text,
                                                          on_release=self.click_on_history_list_item)
             self.screen.ids.screen_manager.get_screen('main').ids.scroll_history.add_widget(self.buffer_item)
+            self.history_data_items.append({'text': self.buffer_item.text, 'secondary_text': self.buffer_item.secondary_text})
         self.buffer_item = None
 
     def dialog_complete_no(self, *args):
@@ -137,6 +131,7 @@ class MyApp(MDApp):
 
     def dialog_delete_yes(self, *args):
         self.dialog_delete.dismiss()
+        self.history_data_items.remove({'text':self.buffer_item.text,'secondary_text':self.buffer_item.secondary_text})
         self.screen.ids.screen_manager.get_screen('main').ids.scroll_history.remove_widget(self.buffer_item)
         self.buffer_item = None
 
@@ -155,6 +150,7 @@ class MyApp(MDApp):
         self.screen.ids.screen_manager.get_screen('main').ids.scroll_active.add_widget(
             TwoLineAvatarIconListItem(text=item + '  ' + number, secondary_text=details,
                                       on_release=self.click_on_active_list_item))
+        self.active_data_items.append({'text':item + '  ' + number,'secondary_text':details})
         self.dialog_new_item.dismiss()
 
     def dialog_new_item_close(self, *args):
@@ -191,6 +187,7 @@ class MyApp(MDApp):
                        color_mode = self.theme_cls.theme_style,
                        switch_color_mode_value=self.screen.ids.screen_manager.get_screen('settings').ids.color_mode.active,
                        switch_clear_mode_value=self.screen.ids.screen_manager.get_screen('settings').ids.clear_mode.active)
+        self.store.put('items_data', active=self.active_data_items, history=self.history_data_items)
 
     def on_start(self):
         settings = self.store.get('settings')
@@ -198,6 +195,19 @@ class MyApp(MDApp):
         self.theme_cls.theme_style = settings['color_mode']
         self.screen.ids.screen_manager.get_screen('settings').ids.color_mode.active = settings['switch_color_mode_value']
         self.screen.ids.screen_manager.get_screen('settings').ids.clear_mode.active = settings['switch_clear_mode_value']
+        self.active_data_items = self.store['items_data']['active']
+        self.history_data_items = self.store['items_data']['history']
+
+        for item in self.active_data_items:
+            self.screen.ids.screen_manager.get_screen('main').ids.scroll_active.add_widget(
+                TwoLineAvatarIconListItem(text=item['text'], secondary_text=item['secondary_text'],
+                                          on_release=self.click_on_active_list_item)
+            )
+        for item in self.history_data_items:
+            self.screen.ids.screen_manager.get_screen('main').ids.scroll_history.add_widget(
+                TwoLineAvatarIconListItem(text=item['text'], secondary_text=item['secondary_text'],
+                                          on_release=self.click_on_history_list_item)
+            )
 
     def build(self):
         return self.screen
